@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "9000:9000"
+    depends_on:
+      - booking-service
+      - user-service
+      - payment-service
+      - tms-db
+    environment:
+      DB_HOST: tms-db
+      DB_USER: root
+      DB_PASS: password
+      DB_NAME: tmsdb
+    networks:
+      - tms-network
+
+  booking-service:
+    build: ./booking-service
+    container_name: booking-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - tms-db
+    environment:
+      DB_HOST: tms-db
+      DB_USER: root
+      DB_PASS: password
+      DB_NAME: tmsdb
+    networks:
+      - tms-network
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8002:8002"
+    depends_on:
+      - tms-db
+    environment:
+      DB_HOST: tms-db
+      DB_USER: root
+      DB_PASS: password
+      DB_NAME: tmsdb
+    networks:
+      - tms-network
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8003:8003"
+    depends_on:
+      - tms-db
+    environment:
+      DB_HOST: tms-db
+      DB_USER: root
+      DB_PASS: password
+      DB_NAME: tmsdb
+    networks:
+      - tms-network
+
+  tms-db:
+    image: mysql:8.0
+    container_name: tms-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: tmsdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - tms-data:/var/lib/mysql
+    networks:
+      - tms-network
+
+networks:
+  tms-network:
+
+volumes:
+  tms-data:
